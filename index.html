@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surebet Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* ── Reset & Base ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-page:    #F8F9FA;
+            --bg-white:   #FFFFFF;
+            --bg-header:  #F9FAFB;
+            --border:     #E5E7EB;
+            --border-md:  #D1D5DB;
+            --border-hd:  #9CA3AF;
+            --text-main:  #111827;
+            --text-sub:   #6B7280;
+            --text-muted: #9CA3AF;
+            --blue:       #1A73E8;
+            --blue-hover: #1558BF;
+            --green:      #188038;
+            --green-lt:   #E6F4EA;
+            --red:        #C5221F;
+            --red-lt:     #FCE8E6;
+            --yellow-lt:  #FEF7E0;
+            --shadow-sm:  0 1px 4px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+            --radius:     6px;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            background: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* ── Layout ── */
+        .page { max-width: 1280px; margin: 0 auto; padding: 24px 20px 60px; }
+
+        /* ── App Header ── */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        .app-header .brand {
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 700; font-size: 16px; color: var(--text-main);
+        }
+        .app-header .brand i { color: var(--green); font-size: 22px; }
+        .app-header .user-info { display: flex; align-items: center; gap: 14px; }
+        .user-email {
+            font-size: 13px; color: var(--text-sub);
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        /* ── Summary Cards (topo) ── */
+        .summary-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 20px 16px;
+            box-shadow: var(--shadow-sm);
+        }
+        .summary-card .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        .summary-card .value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+        }
+        .summary-card .value.positive { color: var(--green); }
+        .summary-card .value.negative { color: var(--red); }
+
+        /* ── Banca Inicial Input ── */
+        .banca-row {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        .banca-row label {
+            font-size: 13px; font-weight: 500; color: var(--text-sub); white-space: nowrap;
+        }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+            gap: 0;
+        }
+        .tab-btn {
+            background: none; border: none; cursor: pointer;
+            padding: 10px 18px; font-size: 13px; font-weight: 500;
+            color: var(--text-sub);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: color .15s, border-color .15s;
+            display: flex; align-items: center; gap: 7px;
+        }
+        .tab-btn:hover { color: var(--text-main); }
+        .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+
+        /* ── Panel ── */
+        .panel {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .panel-header {
+            background: var(--bg-header);
+            border-bottom: 2px solid var(--border);
+            padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 13px; font-weight: 600; color: var(--text-main);
+            letter-spacing: .01em;
+        }
+        .panel-header .badge {
+            background: var(--bg-page); border: 1px solid var(--border);
+            border-radius: 20px; padding: 2px 10px;
+            font-size: 12px; color: var(--text-sub); font-weight: 500;
+        }
+
+        /* ── Form: layout em linha proporcional ── */
+        .form-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            padding: 20px 20px 0;
+            flex-wrap: wrap;
+        }
+        /* Coluna flexível (Evento) */
+        .form-row .fg-flex  { flex: 1 1 220px; min-width: 0; }
+        /* Colunas fixas (Data, Mercado, Stakes, Lucro) */
+        .form-row .fg-140   { flex: 0 0 140px; }
+        .form-row .fg-160   { flex: 0 0 160px; }
+        .form-row .fg-120   { flex: 0 0 120px; }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-sub);
+            margin-bottom: 5px;
+        }
+        .form-group label.accent { color: var(--green); font-weight: 600; }
+
+        /* ── Inputs (sheet cell style, height 38px) ── */
+        input[type="text"], input[type="email"], input[type="number"],
+        input[type="date"], input[type="password"], select {
+            width: 100%;
+            height: 38px;
+            border: 1px solid var(--border-md);
+            border-radius: var(--radius);
+            padding: 0 10px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text-main);
+            background: var(--bg-white);
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        input:focus, select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(26,115,232,.15);
+        }
+        .prefix-wrap { position: relative; }
+        .prefix-wrap .prefix {
+            position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+            font-size: 12px; color: var(--text-muted); pointer-events: none;
+        }
+        .prefix-wrap input { padding-left: 24px; }
+        .input-icon-wrap { position: relative; }
+        .input-icon-wrap i {
+            position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+            font-size: 15px; color: var(--text-muted); pointer-events: none;
+        }
+        .input-icon-wrap input { padding-left: 32px; }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 0 18px; height: 38px; font-size: 13px; font-weight: 500;
+            border-radius: var(--radius); cursor: pointer;
+            border: none; transition: background .15s, opacity .15s;
+            white-space: nowrap;
+        }
+        .btn:disabled { opacity: .55; cursor: not-allowed; }
+        .btn-blue  { background: var(--blue);  color: #fff; }
+        .btn-blue:hover  { background: var(--blue-hover); }
+        .btn-green { background: var(--green); color: #fff; }
+        .btn-green:hover { background: #137333; }
+        .btn-ghost {
+            background: none; border: 1px solid var(--border-md);
+            color: var(--text-sub);
+        }
+        .btn-ghost:hover { background: var(--bg-header); }
+        .btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+        .btn-danger { background: none; border: none; color: var(--text-muted); padding: 5px 7px; border-radius: var(--radius); cursor: pointer; }
+        .btn-danger:hover { color: var(--red); background: var(--red-lt); }
+        .form-actions {
+            padding: 16px 20px 20px;
+            display: flex; align-items: flex-end; justify-content: flex-end; gap: 10px;
+        }
+
+        /* ── Table (spreadsheet) ── */
+        .sheet-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .sheet-table th, .sheet-table td {
+            border: 1px solid var(--border);
+            padding: 11px 16px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .sheet-table thead th {
+            background: #F9FAFB;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+            border-bottom: 2px solid var(--border-hd);
+            position: sticky; top: 0;
+        }
+        .sheet-table tbody tr:hover { background: #F5F7FF; }
+        /* Alinhamento por tipo de coluna */
+        .sheet-table td.right, .sheet-table th.right { text-align: right; }
+        .sheet-table td.center, .sheet-table th.center { text-align: center; }
+        .sheet-table .chip {
+            display: inline-flex; gap: 4px; align-items: center;
+            font-size: 12px; color: var(--text-sub);
+        }
+        .sheet-table .chip span { color: var(--text-main); font-weight: 500; }
+        .empty-row td {
+            text-align: center; padding: 36px; color: var(--text-muted);
+            font-style: italic; font-size: 13px;
+        }
+
+        /* ── Monthly table ── */
+        .month-badge {
+            display: inline-block; font-size: 11px; font-weight: 500;
+            background: var(--bg-page); border: 1px solid var(--border);
+            border-radius: 20px; padding: 1px 8px; color: var(--text-sub);
+        }
+
+        /* ── Profit colors ── */
+        .pos { color: var(--green); font-weight: 600; }
+        .neg { color: var(--red); font-weight: 600; }
+
+        /* ── Login ── */
+        #auth-container {
+            min-height: 100vh;
+            background: var(--bg-page);
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .login-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            padding: 32px 28px;
+            width: 100%; max-width: 360px;
+        }
+        .login-card .logo {
+            text-align: center; margin-bottom: 20px;
+        }
+        .login-card .logo i { font-size: 32px; color: var(--green); }
+        .login-card h1 {
+            font-size: 17px; font-weight: 700; color: var(--text-main);
+            text-align: center; margin-top: 6px;
+        }
+        .login-card p { font-size: 12px; color: var(--text-sub); text-align: center; margin-top: 4px; margin-bottom: 20px; }
+        .login-card .form-group { margin-bottom: 12px; }
+        .login-card .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--text-sub); margin-bottom: 4px; }
+        .login-card input { height: 34px; font-size: 13px; }
+        .login-card .btn { width: 100%; justify-content: center; padding: 8px 14px; font-size: 13px; margin-top: 4px; }
+
+        /* ── Alert messages ── */
+        .alert {
+            display: none; padding: 8px 12px; border-radius: var(--radius);
+            font-size: 12px; font-weight: 500; margin-top: 10px;
+            border: 1px solid; text-align: center;
+        }
+        .alert.error { background: var(--red-lt); color: var(--red); border-color: #F5C6C5; display: block; }
+        .alert.success { background: var(--green-lt); color: var(--green); border-color: #A8D5B5; display: block; }
+        .alert.info { background: var(--yellow-lt); color: #5F4C0B; border-color: #F9DFAD; display: block; }
+
+        /* ── Loading ── */
+        #loading-screen {
+            min-height: 100vh; display: flex; align-items: center;
+            justify-content: center; flex-direction: column; gap: 10px;
+            background: var(--bg-page); color: var(--text-sub); font-size: 13px;
+        }
+        #loading-screen i { font-size: 32px; color: var(--green); animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-page); }
+        ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 4px; }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .form-grid .col-2 { grid-column: span 2; }
+            .summary-bar { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     LOADING
+═══════════════════════════════════════════════════ -->
+<div id="loading-screen">
+    <i class="ph ph-spinner-gap"></i>
+    <span>Carregando Surebet Manager...</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     LOGIN
+═══════════════════════════════════════════════════ -->
+<div id="auth-container" style="display:none">
+    <div class="login-card">
+        <div class="logo">
+            <i class="ph-fill ph-chart-line-up"></i>
+            <h1>Surebet Manager</h1>
+            <p>Digite seu e-mail para acessar o sistema</p>
+        </div>
+
+        <form id="form-login" novalidate>
+            <div class="form-group">
+                <label for="input-email">E-mail</label>
+                <div class="input-icon-wrap">
+                    <i class="ph ph-envelope"></i>
+                    <input type="email" id="input-email" placeholder="voce@email.com" autocomplete="email">
+                </div>
+            </div>
+
+            <button type="submit" id="btn-entrar" class="btn btn-green">
+                <i class="ph-bold ph-sign-in"></i> Entrar
+            </button>
+            <div id="login-msg" class="alert"></div>
+        </form>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     APP
+═══════════════════════════════════════════════════ -->
+<div id="app-container" style="display:none">
+    <div class="page">
+
+        <!-- Header -->
+        <div class="app-header">
+            <div class="brand">
+                <i class="ph-fill ph-chart-line-up"></i>
+                Surebet Manager
+            </div>
+            <div class="user-info">
+                <span class="user-email" id="user-email-display">
+                    <i class="ph ph-user"></i> —
+                </span>
+                <button class="btn btn-ghost btn-sm" id="btn-logout">
+                    <i class="ph ph-sign-out"></i> Sair
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="summary-bar">
+            <div class="summary-card">
+                <div class="label">Banca Inicial</div>
+                <div class="value" id="card-banca-inicial">R$ 0,00</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Banca Atualizada</div>
+                <div class="value" id="card-banca-atualizada">R$ 0,00</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Lucro Total Acumulado</div>
+                <div class="value positive" id="card-lucro-total">R$ 0,00</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Total de Operações</div>
+                <div class="value" id="card-total-ops">0</div>
+            </div>
+        </div>
+
+        <!-- Banca config row -->
+        <div class="banca-row">
+            <label for="banca-inicial"><i class="ph ph-bank"></i> Configurar Banca Inicial (R$):</label>
+            <div class="prefix-wrap" style="width:160px">
+                <span class="prefix">R$</span>
+                <input type="number" id="banca-inicial" step="0.01" placeholder="0,00">
+            </div>
+            <span style="font-size:11px;color:var(--text-muted)">Salvo automaticamente na nuvem</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-dashboard" onclick="switchTab('dashboard')">
+                <i class="ph ph-squares-four"></i> Dashboard & Resumo
+            </button>
+            <button class="tab-btn" id="tab-lancamentos" onclick="switchTab('lancamentos')">
+                <i class="ph ph-pencil-simple-line"></i> Lançamentos Diários
+            </button>
+        </div>
+
+        <!-- ── Dashboard ── -->
+        <div id="content-dashboard">
+            <div class="panel">
+                <div class="panel-header">
+                    <span><i class="ph ph-calendar-blank"></i> Desempenho por Mês — <span id="current-year"></span></span>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="sheet-table">
+                        <thead>
+                            <tr>
+                                <th>Mês</th>
+                                <th>Operações Realizadas</th>
+                                <th class="right">Líquido do Mês (R$)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-mensal"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Lançamentos ── -->
+        <div id="content-lancamentos" style="display:none">
+
+            <!-- Formulário -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span><i class="ph ph-plus"></i> Registrar Nova Operação</span>
+                </div>
+                <form id="form-operacao">
+                    <div class="form-row">
+                        <!-- Data do registro: fixa 140px -->
+                        <div class="form-group fg-140">
+                            <label>Data do Registro</label>
+                            <input type="date" id="input-data" required>
+                        </div>
+                        <!-- Data do Jogo -->
+                        <div class="form-group fg-140">
+                            <label>Data do Jogo</label>
+                            <input type="date" id="input-data-jogo">
+                        </div>
+                        <!-- Horário do Jogo -->
+                        <div class="form-group fg-120">
+                            <label>Horário do Jogo</label>
+                            <input type="time" id="input-hora">
+                        </div>
+                        <!-- Evento: flexível -->
+                        <div class="form-group fg-flex">
+                            <label>Jogo / Evento</label>
+                            <input type="text" id="input-evento" required placeholder="Ex: Flamengo x Palmeiras">
+                        </div>
+                    </div>
+                    <div class="form-row" style="padding-top:12px">
+                        <!-- Mercado -->
+                        <div class="form-group fg-160">
+                            <label>Mercado</label>
+                            <input type="text" id="input-mercado" required placeholder="Ex: Over 2.5">
+                        </div>
+                        <!-- Casa de Apostas 1 -->
+                        <div class="form-group fg-140">
+                            <label>Casa de Apostas 1</label>
+                            <input type="text" id="input-casa1" placeholder="Ex: Bet365">
+                        </div>
+                        <!-- Stake 1 -->
+                        <div class="form-group fg-120">
+                            <label>Stake Casa 1</label>
+                            <div class="prefix-wrap">
+                                <span class="prefix">R$</span>
+                                <input type="number" id="input-stake1" step="0.01" required placeholder="0.00">
+                            </div>
+                        </div>
+                        <!-- Casa de Apostas 2 -->
+                        <div class="form-group fg-140">
+                            <label>Casa de Apostas 2</label>
+                            <input type="text" id="input-casa2" placeholder="Ex: Sportingbet">
+                        </div>
+                        <!-- Stake 2 -->
+                        <div class="form-group fg-120">
+                            <label>Stake Casa 2</label>
+                            <div class="prefix-wrap">
+                                <span class="prefix">R$</span>
+                                <input type="number" id="input-stake2" step="0.01" required placeholder="0.00">
+                            </div>
+                        </div>
+                        <!-- Lucro -->
+                        <div class="form-group fg-120">
+                            <label class="accent">Lucro Líquido</label>
+                            <div class="prefix-wrap">
+                                <span class="prefix" style="color:var(--green)">R$</span>
+                                <input type="number" id="input-lucro" step="0.01" required placeholder="0.00"
+                                    style="border-color:var(--green);color:var(--green);font-weight:600">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="reset" class="btn btn-ghost btn-sm">Limpar</button>
+                        <button type="submit" id="btn-registrar" class="btn btn-green">
+                            <i class="ph-bold ph-check"></i> Registrar Operação
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Histórico -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span><i class="ph ph-table"></i> Histórico de Operações</span>
+                    <span class="badge" id="total-ops-badge">0 registros</span>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="sheet-table">
+                        <thead>
+                            <tr>
+                                <th class="center" style="width:44px">#</th>
+                                <th class="center" style="width:100px">Data Reg.</th>
+                                <th class="center" style="width:100px">Data Jogo</th>
+                                <th class="center" style="width:72px">Horário</th>
+                                <th>Evento</th>
+                                <th>Mercado</th>
+                                <th>Casa 1</th>
+                                <th class="right" style="width:100px">Stake 1</th>
+                                <th>Casa 2</th>
+                                <th class="right" style="width:100px">Stake 2</th>
+                                <th class="right" style="width:110px">Lucro (R$)</th>
+                                <th class="center" style="width:80px">Sacado</th>
+                                <th class="center" style="width:56px">Del.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-operacoes"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /page -->
+</div><!-- /app-container -->
+
+<script>
+// ─── Estado ────────────────────────────────────────────────────────────────
+let session = null;
+let operacoes = [];
+let bancaInicial = 0;
+let bancaTimeout;
+
+const nomesMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+// ─── Fetch helper ──────────────────────────────────────────────────────────
+async function apiFetch(path, opts = {}) {
+    const headers = { 'Content-Type': 'application/json', ...(opts.headers||{}) };
+    if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
+    const res = await fetch(path, { ...opts, headers });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Erro desconhecido');
+    return json;
+}
+
+// ─── Session ───────────────────────────────────────────────────────────────
+function saveSession(s) { session = s; localStorage.setItem('sb_session', JSON.stringify(s)); }
+function loadSession()  { try { return JSON.parse(localStorage.getItem('sb_session')); } catch { return null; } }
+function clearSession() { session = null; localStorage.removeItem('sb_session'); }
+
+// ─── Alert ─────────────────────────────────────────────────────────────────
+function showMsg(msg, type) {
+    const el = document.getElementById('login-msg');
+    el.className = `alert ${type}`;
+    el.textContent = msg;
+}
+
+// ─── Login ─────────────────────────────────────────────────────────────────
+document.getElementById('form-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('input-email').value.trim();
+    if (!email) return showMsg('Digite seu e-mail.', 'error');
+
+    const btn = document.getElementById('btn-entrar');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ph ph-spinner-gap" style="animation:spin 1s linear infinite"></i> Entrando...';
+
+    try {
+        const data = await apiFetch('/api/auth/login', { method:'POST', body: JSON.stringify({ email }) });
+        saveSession(data);
+        await showApp();
+    } catch (err) {
+        if (err.message === 'email_not_confirmed') {
+            showMsg('Confirme seu e-mail antes de entrar (verifique a caixa de entrada).', 'info');
+        } else {
+            showMsg('Erro: ' + err.message, 'error');
+        }
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ph-bold ph-sign-in"></i> Entrar';
+    }
+});
+
+document.getElementById('btn-logout').addEventListener('click', () => {
+    clearSession();
+    showLogin();
+});
+
+// ─── Telas ─────────────────────────────────────────────────────────────────
+function showLogin() {
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('app-container').style.display  = 'none';
+    document.getElementById('auth-container').style.display = 'flex';
+    document.getElementById('login-msg').className = 'alert';
+    document.getElementById('login-msg').textContent = '';
+    document.getElementById('input-email').value = '';
+}
+
+async function showApp() {
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('auth-container').style.display = 'none';
+    document.getElementById('app-container').style.display  = 'block';
+
+    document.getElementById('user-email-display').innerHTML =
+        `<i class="ph ph-user"></i> ${session.user.email}`;
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+    document.getElementById('input-data').valueAsDate = new Date();
+
+    await loadData();
+    updateDashboard();
+    renderOperacoes();
+}
+
+// ─── Dados ─────────────────────────────────────────────────────────────────
+async function loadData() {
+    const [settings, ops] = await Promise.all([
+        apiFetch('/api/settings'),
+        apiFetch('/api/operacoes')
+    ]);
+    bancaInicial = parseFloat(settings.banca_inicial) || 0;
+    document.getElementById('banca-inicial').value = bancaInicial ? bancaInicial.toFixed(2) : '';
+    operacoes = ops;
+}
+
+document.getElementById('banca-inicial').addEventListener('input', (e) => {
+    bancaInicial = parseFloat(e.target.value) || 0;
+    updateDashboard();
+    clearTimeout(bancaTimeout);
+    bancaTimeout = setTimeout(() => {
+        apiFetch('/api/settings', { method:'PUT', body: JSON.stringify({ banca_inicial: bancaInicial }) })
+            .catch(console.error);
+    }, 800);
+});
+
+document.getElementById('form-operacao').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btn-registrar');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ph ph-spinner-gap" style="animation:spin 1s linear infinite"></i> Salvando...';
+
+    try {
+        const payload = {
+            data:       document.getElementById('input-data').value,
+            data_jogo:  document.getElementById('input-data-jogo').value || null,
+            hora:       document.getElementById('input-hora').value || null,
+            evento:     document.getElementById('input-evento').value,
+            mercado:    document.getElementById('input-mercado').value,
+            casa1:      document.getElementById('input-casa1').value,
+            stake1:     parseFloat(document.getElementById('input-stake1').value) || 0,
+            casa2:      document.getElementById('input-casa2').value,
+            stake2:     parseFloat(document.getElementById('input-stake2').value) || 0,
+            lucro:      parseFloat(document.getElementById('input-lucro').value)  || 0
+        };
+        const inserted = await apiFetch('/api/operacoes', { method:'POST', body: JSON.stringify(payload) });
+        operacoes.unshift(inserted);
+        updateDashboard();
+        renderOperacoes();
+        const savedDate = document.getElementById('input-data').value;
+        e.target.reset();
+        document.getElementById('input-data').value = savedDate;
+        document.getElementById('input-evento').focus();
+    } catch (err) {
+        alert('Erro ao salvar: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ph-bold ph-check"></i> Registrar Operação';
+    }
+});
+
+async function deleteOperacao(id) {
+    if (!confirm('Excluir esta operação permanentemente?')) return;
+    operacoes = operacoes.filter(o => o.id !== id);
+    updateDashboard();
+    renderOperacoes();
+    try {
+        await apiFetch(`/api/operacoes/${id}`, { method:'DELETE' });
+    } catch (err) {
+        alert('Erro ao excluir: ' + err.message);
+        await loadData(); updateDashboard(); renderOperacoes();
+    }
+}
+
+async function toggleSacado(id) {
+    const op = operacoes.find(o => o.id === id);
+    if (!op) return;
+    const novoValor = !op.sacado;
+    // Atualiza local primeiro (feedback imediato)
+    op.sacado = novoValor;
+    renderOperacoes();
+    try {
+        await apiFetch(`/api/operacoes/${id}/sacado`, {
+            method: 'PUT',
+            body: JSON.stringify({ sacado: novoValor })
+        });
+    } catch (err) {
+        // Reverte em caso de erro
+        op.sacado = !novoValor;
+        renderOperacoes();
+        alert('Erro ao atualizar: ' + err.message);
+    }
+}
+
+// ─── UI ────────────────────────────────────────────────────────────────────
+function fmt(v) {
+    return new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(v);
+}
+function fmtDate(s) {
+    const p = s ? s.split('-') : [];
+    return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : (s || '—');
+}
+function lucroTotal() {
+    return operacoes.reduce((a, o) => a + (parseFloat(o.lucro) || 0), 0);
+}
+
+function updateDashboard() {
+    const lt  = lucroTotal();
+    const bat = bancaInicial + lt;
+
+    document.getElementById('card-banca-inicial').textContent   = fmt(bancaInicial);
+    document.getElementById('card-banca-atualizada').textContent = fmt(bat);
+    document.getElementById('card-lucro-total').textContent      = fmt(lt);
+    document.getElementById('card-total-ops').textContent        = operacoes.length;
+
+    const el = document.getElementById('card-lucro-total');
+    el.className = 'value ' + (lt >= 0 ? 'positive' : 'negative');
+
+    renderResumoMensal();
+}
+
+function renderResumoMensal() {
+    const ano = new Date().getFullYear();
+    const mes = new Date().getMonth();
+    const dados = Array.from({ length: 12 }, () => ({ q:0, l:0 }));
+
+    operacoes.forEach(op => {
+        if (!op.data) return;
+        const d = new Date(op.data + 'T00:00:00');
+        if (d.getFullYear() === ano) {
+            dados[d.getMonth()].q++;
+            dados[d.getMonth()].l += parseFloat(op.lucro) || 0;
+        }
+    });
+
+    const tb = document.getElementById('table-mensal');
+    tb.innerHTML = '';
+    let found = false;
+
+    dados.forEach((d, i) => {
+        if (d.q > 0 || i === mes) {
+            found = true;
+            const cls = d.l >= 0 ? 'pos' : 'neg';
+            tb.innerHTML += `
+                <tr>
+                    <td><b>${nomesMeses[i]}</b></td>
+                    <td><span class="month-badge">${d.q} ${d.q === 1 ? 'entrada' : 'entradas'}</span></td>
+                    <td class="right ${cls}">${fmt(d.l)}</td>
+                </tr>`;
+        }
+    });
+
+    if (!found) {
+        tb.innerHTML = `<tr class="empty-row"><td colspan="3">Nenhuma operação registrada neste ano.</td></tr>`;
+    }
+}
+
+function renderOperacoes() {
+    const tb = document.getElementById('table-operacoes');
+    const n  = operacoes.length;
+    document.getElementById('total-ops-badge').textContent = `${n} ${n === 1 ? 'registro' : 'registros'}`;
+    tb.innerHTML = '';
+
+    if (n === 0) {
+        tb.innerHTML = `<tr class="empty-row"><td colspan="13">Nenhum lançamento registrado. Use o formulário acima.</td></tr>`;
+        return;
+    }
+
+    operacoes.forEach((op, idx) => {
+        const l       = parseFloat(op.lucro) || 0;
+        const lucroCs = l >= 0 ? 'pos' : 'neg';
+        const sacado  = !!op.sacado;
+        // Linha fica verde claro se sacado
+        const rowStyle = sacado ? 'background:#E6F4EA;' : '';
+        const sacadoBtnStyle = sacado
+            ? 'background:#188038;color:#fff;border:none;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;'
+            : 'background:#fff;color:#6B7280;border:1px solid #D1D5DB;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:500;cursor:pointer;';
+        const sacadoLabel = sacado ? '✓ Sacado' : 'Sacar';
+
+        tb.innerHTML += `
+            <tr style="${rowStyle}">
+                <td class="center" style="color:var(--text-muted);font-size:11px">${n - idx}</td>
+                <td class="center">${fmtDate(op.data)}</td>
+                <td class="center" style="color:var(--text-sub)">${fmtDate(op.data_jogo) !== '—' ? fmtDate(op.data_jogo) : '—'}</td>
+                <td class="center" style="color:var(--text-sub);font-size:12px">${op.hora || '—'}</td>
+                <td>${op.evento || '—'}</td>
+                <td>${op.mercado || '—'}</td>
+                <td style="color:var(--blue);font-size:12px">${op.casa1 || '—'}</td>
+                <td class="right">${fmt(parseFloat(op.stake1)||0)}</td>
+                <td style="color:var(--blue);font-size:12px">${op.casa2 || '—'}</td>
+                <td class="right">${fmt(parseFloat(op.stake2)||0)}</td>
+                <td class="right ${lucroCs}">${fmt(l)}</td>
+                <td class="center">
+                    <button style="${sacadoBtnStyle}" onclick="toggleSacado('${op.id}')">${sacadoLabel}</button>
+                </td>
+                <td class="center">
+                    <button onclick="deleteOperacao('${op.id}')" title="Excluir"
+                        style="background:none;border:none;cursor:pointer;color:#9CA3AF;font-size:16px;line-height:1;padding:4px 6px;border-radius:4px;"
+                        onmouseover="this.style.color='#C5221F';this.style.background='#FCE8E6'"
+                        onmouseout="this.style.color='#9CA3AF';this.style.background='none'">
+                        &#x1F5D1;
+                    </button>
+                </td>
+            </tr>`;
+    });
+}
+
+
+function switchTab(name) {
+    ['dashboard','lancamentos'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const cnt = document.getElementById(`content-${t}`);
+        btn.className = `tab-btn${t === name ? ' active' : ''}`;
+        cnt.style.display = t === name ? 'block' : 'none';
+    });
+}
+
+// ─── Boot ──────────────────────────────────────────────────────────────────
+(async () => {
+    const saved = loadSession();
+    if (saved?.access_token) {
+        session = saved;
+        try {
+            await apiFetch('/api/settings');
+            await showApp();
+        } catch {
+            try {
+                const refreshed = await apiFetch('/api/auth/refresh', {
+                    method: 'POST',
+                    body: JSON.stringify({ refresh_token: saved.refresh_token })
+                });
+                saveSession(refreshed);
+                await showApp();
+            } catch {
+                clearSession();
+                showLogin();
+            }
+        }
+    } else {
+        showLogin();
+    }
+})();
+</script>
+</body>
+</html>
