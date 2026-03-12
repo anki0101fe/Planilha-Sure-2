@@ -23,9 +23,10 @@
             --bg-page: #F8FAFC;
             --bg-white: #FFFFFF;
             --bg-header: #FFFFFF;
+            --bg-alt: #F9FAFB;
+            --bg-hover: #F1F5F9;
             --border: #E5E7EB;
             --border-md: #D1D5DB;
-            --border-hd: #9CA3AF;
             --text-main: #111827;
             --text-sub: #6B7280;
             --text-muted: #9CA3AF;
@@ -35,10 +36,57 @@
             --green-lt: #DCFCE7;
             --red: #EF4444;
             --red-lt: #FEE2E2;
-            --yellow-lt: #FEF3C7;
+            --badge-casa-bg: #EFF6FF;
+            --badge-casa-text: #1D4ED8;
+            --badge-pos-bg: #DCFCE7;
+            --badge-pos-text: #166534;
+            --badge-neg-bg: #FEE2E2;
+            --badge-neg-text: #991B1B;
+            --icon-blue-bg: #EFF6FF;
+            --icon-blue-fg: #2563EB;
+            --icon-green-bg: #F0FDF4;
+            --icon-green-fg: #16A34A;
+            --icon-orange-bg: #FFF7ED;
+            --icon-orange-fg: #EA580C;
             --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --radius: 12px;
         }
+
+        [data-theme="dark"] {
+            --bg-page: #0F172A;
+            --bg-white: #1E293B;
+            --bg-header: #1E293B;
+            --bg-alt: #1e293b;
+            --bg-hover: #334155;
+            --border: #334155;
+            --border-md: #475569;
+            --text-main: #F8FAFC;
+            --text-sub: #94A3B8;
+            --text-muted: #64748B;
+            --blue: #3B82F6;
+            --blue-hover: #60A5FA;
+            --green: #22C55E;
+            --green-lt: rgba(34, 197, 94, 0.15);
+            --red: #F87171;
+            --red-lt: rgba(248, 113, 113, 0.15);
+            --badge-casa-bg: rgba(59, 130, 246, 0.2);
+            --badge-casa-text: #93C5FD;
+            --badge-pos-bg: rgba(34, 197, 94, 0.2);
+            --badge-pos-text: #4ADE80;
+            --badge-neg-bg: rgba(248, 113, 113, 0.2);
+            --badge-neg-text: #FCA5A5;
+            --icon-blue-bg: rgba(59, 130, 246, 0.15);
+            --icon-blue-fg: #60A5FA;
+            --icon-green-bg: rgba(34, 197, 94, 0.15);
+            --icon-green-fg: #4ADE80;
+            --icon-orange-bg: rgba(245, 158, 11, 0.15);
+            --icon-orange-fg: #FBBF24;
+            --shadow-sm: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Ajuste global para transições suaves */
+        * { transition: background-color 0.2s, border-color 0.2s, color 0.1s; }
+        .summary-card *, .btn *, .badge *, input, canvas { transition: none; } /* Desabilitar transição em elementos que não precisam ou que quebram (canvas) */
 
         body {
             font-family: 'Inter', system-ui, sans-serif;
@@ -106,7 +154,7 @@
         /* ── Summary Cards (topo) ── */
         .summary-bar {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 24px;
             margin-bottom: 24px;
         }
@@ -126,15 +174,20 @@
             width: 40px;
             height: 40px;
             border-radius: 8px;
-            background: #EFF6FF;
-            color: var(--blue);
+            background: var(--icon-blue-bg);
+            color: var(--icon-blue-fg);
             font-size: 20px;
             margin-bottom: 16px;
         }
 
         .summary-card.profit .icon-wrapper {
-            background: var(--green-lt);
-            color: var(--green);
+            background: var(--icon-green-bg);
+            color: var(--icon-green-fg);
+        }
+
+        .summary-card.warning .icon-wrapper {
+            background: var(--icon-orange-bg);
+            color: var(--icon-orange-fg);
         }
 
         .summary-card .label {
@@ -356,7 +409,7 @@
             display: block;
             font-size: 13px;
             font-weight: 600;
-            color: #374151;
+            color: var(--text-main);
             margin-bottom: 8px;
         }
 
@@ -521,7 +574,7 @@
 
         .sheet-table th,
         .sheet-table td {
-            border-bottom: 1px solid #E5E7EB;
+            border-bottom: 1px solid var(--border);
             padding: 16px;
             text-align: left;
             vertical-align: middle;
@@ -534,24 +587,24 @@
         }
 
         .sheet-table thead th {
-            background: #F8FAFC;
+            background: var(--bg-alt);
             font-weight: 600;
             font-size: 12px;
-            color: #6B7280;
+            color: var(--text-sub);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             white-space: nowrap;
-            border-bottom: 1px solid #E5E7EB;
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
         }
 
         .sheet-table tbody tr:nth-child(even) {
-            background: #F8FAFC;
+            background: var(--bg-alt);
         }
 
         .sheet-table tbody tr:hover {
-            background: #F1F5F9;
+            background: var(--bg-hover);
         }
 
         /* Alinhamento por tipo de coluna */
@@ -588,8 +641,8 @@
 
         /* ── Modern Badges & Buttons ── */
         .badge-casa {
-            background: #EFF6FF;
-            color: #1D4ED8;
+            background: var(--badge-casa-bg);
+            color: var(--badge-casa-text);
             font-size: 12px;
             font-weight: 600;
             border-radius: 9999px;
@@ -598,8 +651,8 @@
         }
 
         .badge-lucro-pos {
-            background: #DCFCE7;
-            color: #166534;
+            background: var(--badge-pos-bg);
+            color: var(--badge-pos-text);
             font-size: 14px;
             font-weight: 700;
             border-radius: 8px;
@@ -608,8 +661,8 @@
         }
 
         .badge-lucro-neg {
-            background: #FEE2E2;
-            color: #991B1B;
+            background: var(--badge-neg-bg);
+            color: var(--badge-neg-text);
             font-size: 14px;
             font-weight: 700;
             border-radius: 8px;
@@ -693,12 +746,12 @@
         .event-main {
             font-size: 14px;
             font-weight: 600;
-            color: #111827;
+            color: var(--text-main);
         }
 
         .event-sec {
             font-size: 12px;
-            color: #6B7280;
+            color: var(--text-sub);
             font-weight: 400;
         }
 
@@ -949,7 +1002,10 @@
      LOGIN
 ═══════════════════════════════════════════════════ -->
     <div id="auth-container" style="display:none">
-        <div class="login-card">
+        <div class="login-card" style="position:relative">
+            <button class="btn btn-ghost btn-sm" id="btn-theme-toggle-login" title="Alternar Modo Noturno" style="position:absolute; top:12px; right:12px; border:none;">
+                <i class="ph ph-moon"></i>
+            </button>
             <div class="logo">
                 <i class="ph-fill ph-chart-line-up"></i>
                 <h1>Surebet Manager</h1>
@@ -986,6 +1042,9 @@
                     Surebet Manager
                 </div>
                 <div class="user-info">
+                    <button class="btn btn-ghost btn-sm" id="btn-theme-toggle" title="Alternar Modo Noturno">
+                        <i class="ph ph-moon"></i>
+                    </button>
                     <span class="user-email" id="user-email-display">
                         <i class="ph ph-user"></i> —
                     </span>
@@ -1016,6 +1075,16 @@
                     <div class="icon-wrapper"><i class="ph ph-receipt"></i></div>
                     <div class="label">Total de Operações</div>
                     <div class="value" id="card-total-ops">0</div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="icon-wrapper"><i class="ph ph-hourglass-medium"></i></div>
+                    <div class="label">Saques Pendentes</div>
+                    <div class="value" id="card-saques-pendentes">R$ 0,00</div>
+                </div>
+                <div class="summary-card profit">
+                    <div class="icon-wrapper"><i class="ph ph-list-checks"></i></div>
+                    <div class="label">Qtd Saques Pendentes</div>
+                    <div class="value" id="card-qtd-pendentes">0</div>
                 </div>
             </div>
 
@@ -1215,7 +1284,7 @@
                             </div>
                         </div>
 
-                        <div class="form-actions" style="border-top: 1px solid var(--border); background: #F8FAFC;">
+                        <div class="form-actions" style="border-top: 1px solid var(--border); background: var(--bg-alt);">
                             <button type="reset" class="btn btn-ghost btn-sm"
                                 style="height:44px; padding:0 16px; font-size:14px;">Limpar</button>
                             <button type="submit" id="btn-registrar" class="btn btn-green" style="height:44px;">
@@ -1404,6 +1473,39 @@
         let operacoes = [];
         let bancaInicial = 0;
         let bancaTimeout;
+
+        // ─── Theme ─────────────────────────────────────────────────────────────────
+        function initTheme() {
+            const savedTheme = localStorage.getItem('sb_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('sb_theme', currentTheme);
+            updateThemeIcon(currentTheme);
+            // Redesenhar gráficos para atualizar cores do grid/texto
+            renderCharts();
+        }
+
+        function updateThemeIcon(theme) {
+            const btns = ['btn-theme-toggle', 'btn-theme-toggle-login'];
+            btns.forEach(id => {
+                const b = document.getElementById(id);
+                if (b) {
+                    b.innerHTML = theme === 'dark' ? '<i class="ph ph-sun"></i>' : '<i class="ph ph-moon"></i>';
+                    b.onclick = toggleTheme;
+                }
+            });
+        }
+
+        initTheme();
+        // Adicionar listeners iniciais (caso já existam no DOM)
+        document.addEventListener('DOMContentLoaded', () => {
+            updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+        });
 
         const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
             'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -1651,13 +1753,24 @@
             const lt = lucroTotal();
             const bat = bancaInicial + lt;
 
+            // Pendentes
+            const opsPendentes = operacoes.filter(o => !o.sacado);
+            const lucroPendente = opsPendentes.reduce((a, o) => a + (parseFloat(o.lucro) || 0), 0);
+            const qtdPendentes = opsPendentes.length;
+
             document.getElementById('card-banca-inicial').textContent = fmt(bancaInicial);
             document.getElementById('card-banca-atualizada').textContent = fmt(bat);
             document.getElementById('card-lucro-total').textContent = fmt(lt);
             document.getElementById('card-total-ops').textContent = operacoes.length;
+            
+            document.getElementById('card-saques-pendentes').textContent = fmt(lucroPendente);
+            document.getElementById('card-qtd-pendentes').textContent = qtdPendentes;
 
             const el = document.getElementById('card-lucro-total');
             el.className = 'value ' + (lt >= 0 ? 'positive' : 'negative');
+
+            const elP = document.getElementById('card-saques-pendentes');
+            elP.className = 'value ' + (lucroPendente >= 0 ? 'positive' : 'negative');
 
             renderResumoMensal();
             renderCharts();
@@ -1669,6 +1782,11 @@
         let chartCasasIns = null;
 
         function renderCharts() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const chartTextColor = isDark ? '#94A3B8' : '#6B7280';
+            const chartGridColor = isDark ? '#334155' : '#E5E7EB';
+            const chartBorderColor = isDark ? '#1E293B' : '#FFFFFF';
+
             const opsOrdenadas = [...operacoes].sort((a, b) => new Date(a.data) - new Date(b.data));
             let dailyProfits = {};
             let totalInvested = 0;
@@ -1757,7 +1875,7 @@
                         borderWidth: 3,
                         tension: 0.3,
                         fill: true,
-                        pointBackgroundColor: '#FFFFFF',
+                        pointBackgroundColor: chartBorderColor,
                         pointBorderColor: '#22C55E',
                         pointBorderWidth: 2,
                         pointRadius: 4,
@@ -1784,7 +1902,17 @@
                         intersect: false,
                     },
                     scales: {
-                        y: { ticks: { callback: v => 'R$ ' + v } }
+                        x: {
+                            ticks: { color: chartTextColor },
+                            grid: { color: chartGridColor }
+                        },
+                        y: {
+                            ticks: { 
+                                color: chartTextColor,
+                                callback: v => 'R$ ' + v 
+                            },
+                            grid: { color: chartGridColor }
+                        }
                     }
                 }
             });
@@ -1815,7 +1943,17 @@
                         }
                     },
                     scales: {
-                        y: { ticks: { callback: v => 'R$ ' + v } }
+                        x: {
+                            ticks: { color: chartTextColor },
+                            grid: { color: chartGridColor }
+                        },
+                        y: {
+                            ticks: { 
+                                color: chartTextColor,
+                                callback: v => 'R$ ' + v 
+                            },
+                            grid: { color: chartGridColor }
+                        }
                     }
                 }
             });
@@ -1835,14 +1973,21 @@
                         data: casasData,
                         backgroundColor: ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#14B8A6'],
                         borderWidth: 2,
-                        borderColor: '#FFFFFF'
+                        borderColor: chartBorderColor
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 12, family: 'Inter' } } },
+                        legend: { 
+                            position: 'right', 
+                            labels: { 
+                                color: chartTextColor,
+                                boxWidth: 12, 
+                                font: { size: 12, family: 'Inter' } 
+                            } 
+                        },
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
@@ -2021,7 +2166,7 @@
                 opsSacadas.forEach(({ op, oIndex, l }) => {
                     const badgeLucroCls = l >= 0 ? 'badge-lucro-pos' : 'badge-lucro-neg';
                     tbSac.innerHTML += `
-                <tr style="background:#F9FAFB;">
+                <tr>
                     <td class="center event-sec">${oIndex}</td>
                     <td class="center event-sec">${fmtDate(op.data)}</td>
                     <td class="center event-sec">${fmtDate(op.data_jogo) !== '—' ? fmtDate(op.data_jogo) : '—'}</td>
