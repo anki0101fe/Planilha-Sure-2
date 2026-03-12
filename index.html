@@ -1690,6 +1690,7 @@
             // Atualiza local primeiro (feedback imediato)
             op.sacado = novoValor;
             renderOperacoes();
+            updateDashboard();
             try {
                 await apiFetch(`/api/operacoes/${id}/sacado`, {
                     method: 'PUT',
@@ -1699,6 +1700,7 @@
                 // Reverte em caso de erro
                 op.sacado = !novoValor;
                 renderOperacoes();
+                updateDashboard();
                 alert('Erro ao atualizar: ' + err.message);
             }
         }
