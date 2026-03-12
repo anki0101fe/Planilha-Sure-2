@@ -1078,8 +1078,13 @@
                 </div>
                 <div class="summary-card warning">
                     <div class="icon-wrapper"><i class="ph ph-hourglass-medium"></i></div>
-                    <div class="label">Saques Pendentes</div>
+                    <div class="label">Saques Pendentes (Lucro)</div>
                     <div class="value" id="card-saques-pendentes">R$ 0,00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="icon-wrapper" style="background: var(--icon-blue-bg); color: var(--icon-blue-fg);"><i class="ph ph-hand-coins"></i></div>
+                    <div class="label">Valor Investido (Preso)</div>
+                    <div class="value" id="card-valor-investido">R$ 0,00</div>
                 </div>
                 <div class="summary-card profit">
                     <div class="icon-wrapper"><i class="ph ph-list-checks"></i></div>
@@ -1217,14 +1222,23 @@
                                 </div>
                             </div>
 
-                            <div class="form-row" style="padding:0; margin-bottom: 16px;">
+                             <div class="form-row" style="padding:0; margin-bottom: 16px; gap: 16px;">
                                 <!-- Evento -->
-                                <div class="form-group" style="width: 100%;">
+                                <div class="form-group" style="flex: 1;">
                                     <label>Jogo / Evento</label>
                                     <div class="input-icon-wrap">
                                         <i class="ph ph-soccer-ball"></i>
                                         <input type="text" id="input-evento" required
                                             placeholder="Ex: Flamengo x Palmeiras">
+                                    </div>
+                                </div>
+                                <!-- Valor Investido no Form -->
+                                <div class="form-group" style="width: 180px;">
+                                    <label style="color:var(--blue)">Valor Investido</label>
+                                    <div class="prefix-wrap">
+                                        <span class="prefix" style="color:var(--blue)">R$</span>
+                                        <input type="text" id="display-valor-investido" readonly placeholder="0,00"
+                                            style="background: var(--badge-casa-bg); border-color: var(--blue); color: var(--blue); font-weight: 600;">
                                     </div>
                                 </div>
                             </div>
@@ -1583,6 +1597,18 @@
             document.getElementById('current-year').textContent = new Date().getFullYear();
             document.getElementById('input-data').valueAsDate = new Date();
 
+            // Sincronizar Valor Investido no Form
+            const updateInvestidoForm = () => {
+                const s1 = parseFloat(document.getElementById('input-stake1').value) || 0;
+                const s2 = parseFloat(document.getElementById('input-stake2').value) || 0;
+                document.getElementById('display-valor-investido').value = (s1 + s2).toFixed(2).replace('.', ',');
+            };
+            document.getElementById('input-stake1').addEventListener('input', updateInvestidoForm);
+            document.getElementById('input-stake2').addEventListener('input', updateInvestidoForm);
+            document.getElementById('form-operacao').addEventListener('reset', () => {
+                setTimeout(() => updateInvestidoForm(), 0);
+            });
+
             await loadData();
             updateDashboard();
             renderOperacoes();
@@ -1756,6 +1782,7 @@
             // Pendentes
             const opsPendentes = operacoes.filter(o => !o.sacado);
             const lucroPendente = opsPendentes.reduce((a, o) => a + (parseFloat(o.lucro) || 0), 0);
+            const valorInvestidoPreso = opsPendentes.reduce((a, o) => a + (parseFloat(o.stake1) || 0) + (parseFloat(o.stake2) || 0), 0);
             const qtdPendentes = opsPendentes.length;
 
             document.getElementById('card-banca-inicial').textContent = fmt(bancaInicial);
@@ -1764,6 +1791,7 @@
             document.getElementById('card-total-ops').textContent = operacoes.length;
             
             document.getElementById('card-saques-pendentes').textContent = fmt(lucroPendente);
+            document.getElementById('card-valor-investido').textContent = fmt(valorInvestidoPreso);
             document.getElementById('card-qtd-pendentes').textContent = qtdPendentes;
 
             const el = document.getElementById('card-lucro-total');
