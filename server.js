@@ -189,6 +189,33 @@ app.put('/api/operacoes/:id/sacado', async (req, res) => {
     res.json(data);
 });
 
+// ─── PUT /api/operacoes/:id ────────────────────────────────────────────────
+app.put('/api/operacoes/:id', async (req, res) => {
+    console.log(`[PUT] Atualizando operação ${req.params.id}`);
+    const token = extractToken(req);
+    if (!token) return res.status(401).json({ error: 'Não autenticado.' });
+
+    const client = getClientForUser(token);
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) return res.status(401).json({ error: 'Token inválido.' });
+
+    const { evento, mercado, stake1, stake2, lucro, hora, casa1, casa2, data_jogo } = req.body;
+    const date = req.body.data;
+
+    const { data, error } = await client.from('operacoes')
+        .update({
+            data: date, hora, data_jogo,
+            evento, mercado, stake1, stake2, lucro,
+            casa1, casa2
+        })
+        .eq('id', req.params.id)
+        .eq('user_id', user.id)
+        .select().single();
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
 // ─── DELETE /api/operacoes/:id ─────────────────────────────────────────────
 app.delete('/api/operacoes/:id', async (req, res) => {
     const token = extractToken(req);
@@ -204,6 +231,11 @@ app.delete('/api/operacoes/:id', async (req, res) => {
         .eq('user_id', user.id);
     if (error) return res.status(500).json({ error: error.message });
     res.json({ success: true });
+});
+
+app.use((req, res, next) => {
+    console.log(`[ROUTE NOT FOUND] ${req.method} ${req.url}`);
+    next();
 });
 
 // ─── SERVER INICIADO (LOCAL OU VERCEL) ──────────────────────────────────────
